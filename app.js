@@ -108,10 +108,10 @@ function loadSong(song) {
   songTitle.innerText = song;
   audioSong.src = `songs/${song}.mp3`;
   cover.src = `covers/${song}.jpg`;
-  const flames = document.querySelectorAll('.flame')
-  flames.forEach(flame => {
-    flame.style.height = '0.05rem'
-  })
+  const flames = document.querySelectorAll(".flame");
+  flames.forEach((flame) => {
+    flame.style.height = "0.05rem";
+  });
 }
 
 function playPause() {
@@ -127,7 +127,7 @@ function playSong() {
   playBtn.querySelector("i").classList.remove("bi-play");
   playBtn.querySelector("i").classList.add("bi-pause");
   audioSong.play();
-  fireEffectInterval = setInterval(fireEffectStart, 100);
+  fireEffectStart();
 }
 
 function puseSong() {
@@ -135,16 +135,17 @@ function puseSong() {
   playBtn.querySelector("i").classList.add("bi-play");
   playBtn.querySelector("i").classList.remove("bi-pause");
   audioSong.pause();
-  clearInterval(fireEffectInterval);
+  clearTimeout(fireEffectTimeout);
 }
 
 function fireEffectStart() {
   const flames = document.querySelectorAll(".playing .fire-effect .flame");
   flames.forEach((flame) => {
-    flame.style.height = '1rem'
+    flame.style.height = "1rem";
     const random = Math.random();
     flame.style.transform = `scaleY(${random})`;
   });
+  fireEffectTimeout = setTimeout(fireEffectStart, 100);
 }
 
 function nextSong() {
@@ -156,6 +157,7 @@ function nextSong() {
     song.classList.remove("playing");
     if (song.id == songIndex) song.classList.add("playing");
   });
+  clearTimeout(fireEffectTimeout);
   loadSong(songs[songIndex]);
   if (isPlaying) playSong();
 }
@@ -169,6 +171,7 @@ function prevSong() {
     song.classList.remove("playing");
     if (song.id == songIndex) song.classList.add("playing");
   });
+  clearTimeout(fireEffectTimeout);
   loadSong(songs[songIndex]);
   if (isPlaying) playSong();
 }
@@ -209,6 +212,9 @@ function playPlayListMusic(event) {
   });
   songIndex = song.id;
   song.classList.add("playing");
+  if(isPlaying){
+    clearTimeout(fireEffectTimeout)
+  }
   loadSong(songs[songIndex]);
   playSong();
 }
