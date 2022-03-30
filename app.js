@@ -132,10 +132,10 @@ function playSong() {
 
 function puseSong() {
   isPlaying = false;
-  clearInterval(fireEffectInterval);
   playBtn.querySelector("i").classList.add("bi-play");
   playBtn.querySelector("i").classList.remove("bi-pause");
   audioSong.pause();
+  clearInterval(fireEffectInterval);
 }
 
 function fireEffectStart() {
