@@ -24,6 +24,21 @@ const songs = [
   "wires - athlete",
   "zendegi - ahmad zahir",
 ];
+const colors = [
+  "#FFD705", //1
+  "#F3D705", //2
+  "#E9D705", //3
+  "#DDD705", //4
+  "#D3D705", //5
+  "#C8D705", //6
+  "#BDD705", //7
+  "#B2D705", //8
+  "#ABD705", //9
+  "#A1D705", //10
+];
+let flameColorIndex = 0;
+let flameColorOrder = true;
+
 showPlayList();
 const playListSongs = document.querySelectorAll(".play-list .music");
 
@@ -37,7 +52,6 @@ audioSong.onloadedmetadata = function () {
 };
 audioSong.volume = 0.5;
 volume.style.width = "50%";
-
 
 //Event Listeners
 playBtn.addEventListener("click", playPause);
@@ -55,19 +69,38 @@ playList.addEventListener("click", playPlayListMusic);
 function showPlayList() {
   songs.forEach((song, index) => {
     //create a div element for each song in playlist
-    const div = document.createElement('div')
-    div.classList.add('music')
-    if(index == 0) div.classList.add('playing')
-    div.id = index
-    const img = document.createElement('img')
-    img.src = `./covers/${song}.jpg`
-    img.alt = song
-    const h3 = document.createElement('h3')
-    h3.classList.add('play-list-music-title')
-    h3.innerText = song
-    div.appendChild(img)
-    div.appendChild(h3)
-    playList.appendChild(div)
+    const div = document.createElement("div");
+    div.classList.add("music");
+    if (index == 0) div.classList.add("playing");
+    div.id = index;
+    const img = document.createElement("img");
+    img.src = `./covers/${song}.jpg`;
+    img.alt = song;
+    const h3 = document.createElement("h3");
+    h3.classList.add("play-list-music-title");
+    h3.innerText = song;
+    const fireEffect = document.createElement("div");
+    fireEffect.classList.add("fire-effect");
+
+    for (let i = 0; i < 35; i++) {
+      const flame = document.createElement("div");
+      flame.classList.add("flame");
+      flame.style.width = "0.1rem";
+      flame.style.backgroundColor = colors[flameColorIndex];
+      // flame.style.boxShadow = `0px 0px 5px ${colors[flameColorIndex]}`;
+      fireEffect.appendChild(flame);
+
+      if (flameColorOrder) flameColorIndex++;
+      else flameColorIndex--;
+
+      if (flameColorIndex == colors.length - 1) flameColorOrder = false;
+      if (flameColorIndex == 0) flameColorOrder = true;
+    }
+
+    div.appendChild(img);
+    div.appendChild(h3);
+    div.appendChild(fireEffect);
+    playList.appendChild(div);
   });
 }
 
@@ -75,6 +108,10 @@ function loadSong(song) {
   songTitle.innerText = song;
   audioSong.src = `songs/${song}.mp3`;
   cover.src = `covers/${song}.jpg`;
+  const flames = document.querySelectorAll('.flame')
+  flames.forEach(flame => {
+    flame.style.height = '0.05rem'
+  })
 }
 
 function playPause() {
@@ -90,22 +127,23 @@ function playSong() {
   playBtn.querySelector("i").classList.remove("bi-play");
   playBtn.querySelector("i").classList.add("bi-pause");
   audioSong.play();
-  playListSongs.forEach((e) => {
-    if (e.id == songIndex) {
-      e.classList.add("spin");
-    }
-  });
+  fireEffectInterval = setInterval(fireEffectStart, 100);
 }
 
 function puseSong() {
   isPlaying = false;
+  clearInterval(fireEffectInterval);
   playBtn.querySelector("i").classList.add("bi-play");
   playBtn.querySelector("i").classList.remove("bi-pause");
   audioSong.pause();
-  playListSongs.forEach((e) => {
-    if (e.id == songIndex) {
-      e.classList.remove("spin");
-    }
+}
+
+function fireEffectStart() {
+  const flames = document.querySelectorAll(".playing .fire-effect .flame");
+  flames.forEach((flame) => {
+    flame.style.height = '1rem'
+    const random = Math.random();
+    flame.style.transform = `scaleY(${random})`;
   });
 }
 
@@ -116,11 +154,10 @@ function nextSong() {
   }
   playListSongs.forEach((song) => {
     song.classList.remove("playing");
-    song.classList.remove("spin");
     if (song.id == songIndex) song.classList.add("playing");
   });
   loadSong(songs[songIndex]);
-  if(isPlaying) playSong()
+  if (isPlaying) playSong();
 }
 
 function prevSong() {
@@ -130,11 +167,10 @@ function prevSong() {
   }
   playListSongs.forEach((song) => {
     song.classList.remove("playing");
-    song.classList.remove("spin");
     if (song.id == songIndex) song.classList.add("playing");
   });
   loadSong(songs[songIndex]);
-  if(isPlaying) playSong()
+  if (isPlaying) playSong();
 }
 
 function loopSet() {
@@ -170,11 +206,9 @@ function playPlayListMusic(event) {
   const song = event.target;
   playListSongs.forEach((element) => {
     element.classList.remove("playing");
-    element.classList.remove("spin");
   });
   songIndex = song.id;
   song.classList.add("playing");
-  song.classList.add("spin");
   loadSong(songs[songIndex]);
   playSong();
 }
@@ -184,18 +218,18 @@ function setVolume(e) {
   volume.style.width = `${clickX}px`;
   audioSong.volume = clickX / volumeWidth;
   //change btn icon look
-  if(audioSong.volume == 0){
-    volumeBtn.classList.remove('bi-volume-up')
-    volumeBtn.classList.remove('bi-volume-down')
-    volumeBtn.classList.add('bi-volume-mute')
-  }else if(audioSong.volume <= 0.4){
-    volumeBtn.classList.remove('bi-volume-up')
-    volumeBtn.classList.add('bi-volume-down')
-    volumeBtn.classList.remove('bi-volume-mute')
-  }else{
-    volumeBtn.classList.add('bi-volume-up')
-    volumeBtn.classList.remove('bi-volume-down')
-    volumeBtn.classList.remove('bi-volume-mute')
+  if (audioSong.volume == 0) {
+    volumeBtn.classList.remove("bi-volume-up");
+    volumeBtn.classList.remove("bi-volume-down");
+    volumeBtn.classList.add("bi-volume-mute");
+  } else if (audioSong.volume <= 0.4) {
+    volumeBtn.classList.remove("bi-volume-up");
+    volumeBtn.classList.add("bi-volume-down");
+    volumeBtn.classList.remove("bi-volume-mute");
+  } else {
+    volumeBtn.classList.add("bi-volume-up");
+    volumeBtn.classList.remove("bi-volume-down");
+    volumeBtn.classList.remove("bi-volume-mute");
   }
 }
 function volumeBtnAction() {
