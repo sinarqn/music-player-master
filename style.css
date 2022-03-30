@@ -70,7 +70,7 @@ img {
 .play-list img {
   height: 40px;
   width: 40px;
-  border-radius: 50%;
+  border-radius: 2px;
   pointer-events: none;
 }
 .play-list-music-title {
