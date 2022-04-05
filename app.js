@@ -1,5 +1,6 @@
 // Selectors
 const musicContainer = document.querySelector(".music-container");
+const themeBtn = document.querySelector("#themeBtn");
 const playBtn = document.querySelector("#play");
 const prevBtn = document.querySelector("#prev");
 const nextBtn = document.querySelector("#next");
@@ -15,6 +16,7 @@ const progress = document.querySelector(".progress");
 const currentSongTime = document.querySelector(".current-time");
 const songDuration = document.querySelector(".song-duration");
 const playList = document.querySelector(".play-list");
+let darkTheme = false;
 const songs = [
   "bashkard - abdurahman",
   "bayad - shadmehr",
@@ -44,7 +46,7 @@ const playListSongs = document.querySelectorAll(".play-list .music");
 
 //set default settings
 let songIndex = 0;
-let songLoop = true;
+let songLoop = false;
 let isPlaying = false;
 loadSong(songs[songIndex]);
 audioSong.onloadedmetadata = function () {
@@ -54,6 +56,7 @@ audioSong.volume = 0.5;
 volume.style.width = "50%";
 
 //Event Listeners
+themeBtn.addEventListener("click", changeTheme);
 playBtn.addEventListener("click", playPause);
 nextBtn.addEventListener("click", nextSong);
 prevBtn.addEventListener("click", prevSong);
@@ -112,6 +115,42 @@ function loadSong(song) {
   flames.forEach((flame) => {
     flame.style.height = "0.05rem";
   });
+}
+
+function changeTheme() {
+  const themeSun = document.querySelector('#themeSun')
+  const themeMoon = document.querySelector('#themeMoon')
+  const body = document.querySelector("body");
+  const musicApp = document.querySelector(".music-app");
+  if (darkTheme) {
+    //light everything
+    darkTheme = false;
+    themeSun.style.left = "1rem";
+    themeMoon.style.left = "1rem";
+    themeSun.style.opacity = '1'
+    themeMoon.style.opacity = '0'
+    themeBtn.style.border = "2px solid orange";
+    themeBtn.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+    body.style.backgroundColor = "#eee";
+    musicApp.style.backgroundColor = "#eee";
+    musicApp.style.color = "#000";
+    musicApp.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.2)";
+    if (songLoop) loopBtn.style.color = "#000";
+  } else {
+    //darken everything
+    darkTheme = true;
+    themeSun.style.left = "2rem";
+    themeMoon.style.left = "2rem";
+    themeSun.style.opacity = '0'
+    themeMoon.style.opacity = '1'
+    themeBtn.style.border = "2px solid #eee";
+    themeBtn.style.boxShadow = "0 0 20px rgba(0, 0, 0, 1)";
+    body.style.backgroundColor = "#333";
+    musicApp.style.backgroundColor = "#333";
+    musicApp.style.color = "#eee";
+    if (songLoop) loopBtn.style.color = "#eee";
+    musicApp.style.boxShadow = "0 0 10px rgba(255, 255, 255, 0.2)";
+  }
 }
 
 function playPause() {
@@ -177,9 +216,14 @@ function prevSong() {
 }
 
 function loopSet() {
-  loopBtn.classList.toggle("active");
-  if (songLoop) songLoop = false;
-  else songLoop = true;
+  if (songLoop) {
+    songLoop = false;
+    loopBtn.style.color = "#999";
+  } else {
+    songLoop = true;
+    if (darkTheme) loopBtn.style.color = "#eee";
+    else loopBtn.style.color = "#000";
+  }
 }
 
 function updateProgress(e) {
@@ -212,8 +256,8 @@ function playPlayListMusic(event) {
   });
   songIndex = song.id;
   song.classList.add("playing");
-  if(isPlaying){
-    clearTimeout(fireEffectTimeout)
+  if (isPlaying) {
+    clearTimeout(fireEffectTimeout);
   }
   loadSong(songs[songIndex]);
   playSong();
